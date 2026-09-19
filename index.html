@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공포의 부엌: 청소년 식생활 탈출기 | 중1 기술·가정 방탈출 게임</title>
+  <meta name="description" content="중학교 1학년 기술·가정 연계 청소년 식생활 문제(아침결식, 섭식장애, 탄산음료와 당뇨병, 편의점 나트륨과 고혈압) 해결 방탈출 교육용 웹 게임">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 화면 비네팅 및 공포 무드 오버레이 -->
+  <div class="horror-overlay"></div>
+
+  <div class="game-container">
+    <!-- 상단 HUD -->
+    <header class="top-hud">
+      <div class="game-title-group">
+        <h1>🍳 공포의 부엌: 청소년 식생활 탈출기</h1>
+        <span class="sub-title">중1 기술·가정 | 식생활 문제 해결 방탈출 미션</span>
+      </div>
+
+      <div class="status-group">
+        <!-- 1분 타임어택 타이머 -->
+        <div id="timer-display" class="timer-display" title="남은 탈출 시간 (1분 제한)">
+          ⏱️ <span id="timer-seconds">1:00</span>
+        </div>
+
+        <!-- 정신력 / 산소 게이지 -->
+        <div class="sanity-meter" title="오답 시 정신력이 감소하며 0이 되면 게임 오버됩니다">
+          <span>정신력:</span>
+          <div class="meter-track">
+            <div id="sanity-bar-fill" class="meter-fill" style="width: 100%;"></div>
+          </div>
+          <span id="sanity-val">100%</span>
+        </div>
+
+        <!-- HUD 액션 버튼 -->
+        <div class="hud-actions">
+          <button id="btn-open-notebook" class="btn-hud btn-hud-primary">
+            📋 수업 내용 정리 (학습지)
+          </button>
+          <button id="btn-toggle-sound" class="btn-hud">
+            🔊 사운드 ON
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 공포 주방 메인 인터랙티브 뷰포트 -->
+    <main class="kitchen-room-viewport">
+      <div class="room-ambient-light"></div>
+
+      <!-- 공포 주방 SVG 그래픽 룸 -->
+      <svg class="kitchen-svg-scene" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <!-- 주방 벽면 & 바닥 그라디언트 -->
+          <linearGradient id="wallGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0b1017"/>
+            <stop offset="65%" stop-color="#182330"/>
+            <stop offset="100%" stop-color="#0f1620"/>
+          </linearGradient>
+          <linearGradient id="floorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#12171e"/>
+            <stop offset="100%" stop-color="#05080b"/>
+          </linearGradient>
+          <!-- 오염된 빛/방사 그라디언트 -->
+          <radialGradient id="greenGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#48cae4" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#48cae4" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="redGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#e63946" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#e63946" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- 배경 벽면 -->
+        <rect x="0" y="0" width="1000" height="380" fill="url(#wallGrad)" />
+        <!-- 타일 바닥 -->
+        <polygon points="0,380 1000,380 1000,560 0,560" fill="url(#floorGrad)" />
+        <line x1="0" y1="380" x2="1000" y2="380" stroke="#253241" stroke-width="3" />
+
+        <!-- 바닥 타일 투시선 -->
+        <line x1="150" y1="380" x2="50" y2="560" stroke="#1d2632" stroke-width="1.5" />
+        <line x1="350" y1="380" x2="280" y2="560" stroke="#1d2632" stroke-width="1.5" />
+        <line x1="650" y1="380" x2="720" y2="560" stroke="#1d2632" stroke-width="1.5" />
+        <line x1="850" y1="380" x2="950" y2="560" stroke="#1d2632" stroke-width="1.5" />
+
+        <!-- 주방 조리대 싱크대 구조물 -->
+        <rect x="340" y="320" width="320" height="120" fill="#1b2532" stroke="#2b3b4f" stroke-width="2" rx="4" />
+        <rect x="350" y="330" width="300" height="20" fill="#263445" />
+
+        <!-- [구역 1] 썩어가는 냉장고 (좌측) -->
+        <g class="kitchen-hotspot" data-area="fridge" transform="translate(40, 110)">
+          <circle cx="90" cy="150" r="110" fill="url(#greenGlow)" class="hotspot-halo" />
+          <!-- 냉장고 본체 -->
+          <rect x="20" y="10" width="140" height="300" rx="10" fill="#1c2530" stroke="#3b4d63" stroke-width="3" />
+          <line x1="20" y1="120" x2="160" y2="120" stroke="#0d131a" stroke-width="3" />
+          <!-- 냉장고 손잡이 -->
+          <rect x="35" y="60" width="8" height="40" rx="3" fill="#64748b" />
+          <rect x="35" y="140" width="8" height="60" rx="3" fill="#64748b" />
+          <!-- 썩은 곰팡이/오염 흔적 -->
+          <path d="M40,15 Q60,35 45,50 T30,90" fill="none" stroke="#2d6a4f" stroke-width="3" opacity="0.7" />
+          <path d="M120,130 Q145,150 130,180" fill="none" stroke="#2d6a4f" stroke-width="3" opacity="0.7" />
+          <!-- 냉장고 아이콘 & 텍스트 태그 -->
+          <text x="90" y="195" font-size="36" text-anchor="middle">🧊</text>
+          <rect x="15" y="275" width="150" height="26" rx="6" fill="rgba(10,14,20,0.85)" stroke="#3b4d63" />
+          <text x="90" y="293" class="hotspot-tag">1. 썩어가는 냉장고</text>
+        </g>
+
+        <!-- [구역 2] 깨진 거울과 저주받은 체중계 (좌측 상단-중간) -->
+        <g class="kitchen-hotspot" data-area="mirror" transform="translate(225, 90)">
+          <circle cx="50" cy="90" r="80" fill="url(#redGlow)" class="hotspot-halo" />
+          <!-- 거울 틀 -->
+          <rect x="10" y="10" width="80" height="120" rx="6" fill="#182330" stroke="#c5a059" stroke-width="3" />
+          <!-- 거울 유리 & 금 간 흔적 -->
+          <rect x="18" y="18" width="64" height="104" fill="#223040" />
+          <path d="M30,20 L50,65 L70,55 L82,100" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.8" />
+          <!-- 체중계 바닥 기구 -->
+          <rect x="15" y="180" width="70" height="50" rx="8" fill="#1e2632" stroke="#485a70" stroke-width="2" />
+          <circle cx="50" cy="198" r="14" fill="#ff4d4d" opacity="0.85" />
+          <text x="50" y="203" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">ERROR</text>
+          <text x="50" y="80" font-size="30" text-anchor="middle">🪞</text>
+          <!-- 태그 -->
+          <rect x="-10" y="238" width="120" height="26" rx="6" fill="rgba(10,14,20,0.85)" stroke="#c5a059" />
+          <text x="50" y="256" class="hotspot-tag">2. 깨진 거울·체중계</text>
+        </g>
+
+        <!-- [구역 3] 부글부글 끓는 마녀의 냄비 (중앙 조리대 위) -->
+        <g class="kitchen-hotspot" data-area="cauldron" transform="translate(430, 210)">
+          <circle cx="70" cy="80" r="95" fill="url(#redGlow)" class="hotspot-halo" />
+          <!-- 솥 본체 -->
+          <ellipse cx="70" cy="110" rx="60" ry="38" fill="#111822" stroke="#4b5d73" stroke-width="3" />
+          <!-- 보라/자주색 끓는 거품 -->
+          <ellipse cx="70" cy="98" rx="52" ry="24" fill="#7209b7" opacity="0.85" />
+          <circle cx="50" cy="90" r="8" fill="#b5179e" opacity="0.9" />
+          <circle cx="85" cy="92" r="10" fill="#f72585" opacity="0.8" />
+          <circle cx="68" cy="84" r="6" fill="#4cc9f0" opacity="0.9" />
+          <!-- 피어오르는 액상과당 독기 증기 -->
+          <path d="M50,80 Q40,50 60,30 T75,10" fill="none" stroke="#b5179e" stroke-width="4" opacity="0.6" stroke-dasharray="4" />
+          <path d="M85,80 Q95,50 80,30 T88,10" fill="none" stroke="#f72585" stroke-width="4" opacity="0.6" stroke-dasharray="4" />
+          <!-- 이모지 & 태그 -->
+          <text x="70" y="70" font-size="32" text-anchor="middle">🧪</text>
+          <rect x="0" y="150" width="140" height="26" rx="6" fill="rgba(10,14,20,0.85)" stroke="#b5179e" />
+          <text x="70" y="168" class="hotspot-tag">3. 마녀의 가당 냄비</text>
+        </g>
+
+        <!-- [구역 4] 편의점 야식 선반 (우측 상단-중간) -->
+        <g class="kitchen-hotspot" data-area="shelf" transform="translate(680, 110)">
+          <circle cx="60" cy="110" r="90" fill="url(#greenGlow)" class="hotspot-halo" />
+          <!-- 선반 받침대 2단 -->
+          <rect x="5" y="40" width="110" height="10" fill="#2d3b4d" rx="2" />
+          <rect x="5" y="110" width="110" height="10" fill="#2d3b4d" rx="2" />
+          <!-- 나트륨 라면 용기 & 통조림 -->
+          <polygon points="20,40 25,15 45,15 50,40" fill="#e76f51" stroke="#222" />
+          <polygon points="65,40 70,18 90,18 95,40" fill="#f4a261" stroke="#222" />
+          <rect x="25" y="80" width="22" height="30" fill="#e63946" rx="2" />
+          <rect x="65" y="80" width="28" height="30" fill="#e9c46a" rx="2" />
+          <!-- 태그 -->
+          <text x="60" y="165" font-size="34" text-anchor="middle">🥫</text>
+          <rect x="-10" y="180" width="140" height="26" rx="6" fill="rgba(10,14,20,0.85)" stroke="#3b4d63" />
+          <text x="60" y="198" class="hotspot-tag">4. 편의점 야식 선반</text>
+        </g>
+
+        <!-- [구역 5] 사슬로 봉인된 탈출문 (우측 끝) -->
+        <g class="kitchen-hotspot" data-area="door" transform="translate(830, 90)">
+          <circle cx="70" cy="160" r="110" fill="url(#redGlow)" class="hotspot-halo" />
+          <!-- 거대한 철문 -->
+          <rect x="15" y="10" width="110" height="330" rx="8" fill="#17222d" stroke="#5a189a" stroke-width="4" />
+          <!-- 쇠사슬 X자 교차선 -->
+          <line x1="20" y1="20" x2="120" y2="330" stroke="#7b2cbf" stroke-width="5" stroke-dasharray="10,6" />
+          <line x1="120" y1="20" x2="20" y2="330" stroke="#7b2cbf" stroke-width="5" stroke-dasharray="10,6" />
+          <!-- 중앙 큰 자물쇠 -->
+          <rect x="52" y="150" width="36" height="32" rx="6" fill="#c5a059" stroke="#fff" stroke-width="2" />
+          <path d="M58,150 V138 A12,12 0 0,1 82,138 V150" fill="none" stroke="#c5a059" stroke-width="4" />
+          <text x="70" y="225" font-size="32" text-anchor="middle">🗝️</text>
+          <!-- 태그 -->
+          <rect x="0" y="300" width="140" height="26" rx="6" fill="rgba(10,14,20,0.85)" stroke="#7b2cbf" />
+          <text x="70" y="318" class="hotspot-tag">5. 봉인된 탈출문</text>
+        </g>
+      </svg>
+    </main>
+
+    <!-- 하단 인벤토리 (5대 영양 부적 슬롯) -->
+    <footer class="bottom-inventory">
+      <div class="inventory-header">
+        🎒 획득한 영양 부적 (5개 수집 시 탈출문 개방):
+      </div>
+      <div id="inventory-slots" class="inventory-slots">
+        <!-- JS에서 동적 렌더링 -->
+      </div>
+    </footer>
+  </div>
+
+  <!-- ----------------------------------------------------------------------
+       1. 스토리 인트로 모달 (게임 시작 전)
+       ---------------------------------------------------------------------- -->
+  <div id="modal-intro" class="modal-backdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>🏚️ 어둠 속에서 눈을 떴습니다...</h3>
+      </div>
+      <div class="modal-body intro-content">
+        <div class="intro-story-box">
+          <p>
+            시험 기간 늦은 밤, 야식으로 컵라면과 탄산음료를 잔뜩 먹고 잠든 당신...<br>
+            눈을 떠보니 기괴하고 으스스한 <strong>'공포의 부엌'</strong>에 갇혀 있습니다!
+          </p>
+          <br>
+          <p>
+            부엌 곳곳에는 청소년기 잘못된 식습관(아침결식, 섭식장애, 탄산/가당음료 과다, 편의점 고나트륨 식품)이 만들어낸 악령들이 도사리고 있습니다.
+          </p>
+        </div>
+
+        <div class="intro-rules-box">
+          <strong>⚠️ 방탈출 규칙 & 수업 미션:</strong>
+          <ul>
+            <li>⏱️ <strong>1분 타임어택:</strong> 1분(60초) 안에 탈출하지 못하면 부엌에 영원히 갇힙니다!</li>
+            <li>🧠 <strong>구역당 2문제 해결:</strong> 1단계(원인·위험성 탐구) ➔ 2단계(건강 식품 실천 선택)를 통과해야 부적을 획득합니다.</li>
+            <li>💔 <strong>정신력 관리:</strong> 해로운 정크푸드를 고르면 정신력(-20%)이 깎입니다. 0이 되면 탈락합니다!</li>
+            <li>🚪 <strong>최종 탈출문:</strong> 4개의 부적을 모두 모은 뒤, 탈출문에서 균형 잡힌 6대 영양소 식단을 맞춰야 탈출할 수 있습니다!</li>
+          </ul>
+        </div>
+
+        <button id="btn-start-game" class="btn-start-game">
+          🔥 1분 타임어택 방탈출 시작하기!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ----------------------------------------------------------------------
+       2. 구역 2단계 퀴즈 모달 (냉장고, 거울, 냄비, 선반, 문)
+       ---------------------------------------------------------------------- -->
+  <div id="modal-puzzle" class="modal-backdrop hidden">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 id="puzzle-modal-title">구역 이름</h3>
+        <button id="btn-close-puzzle" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="puzzle-problem-desc" class="sub-title" style="margin-bottom: 14px; color: #a0aec0;"></p>
+
+        <!-- 2단계 인디케이터 네비 -->
+        <div id="quiz-step-nav" class="quiz-step-nav"></div>
+
+        <!-- 질문 카드 -->
+        <div id="quiz-prompt-text" class="quiz-prompt-card"></div>
+
+        <!-- 4지선다 옵션 리스트 -->
+        <div id="quiz-options-container" class="quiz-options-list"></div>
+
+        <!-- 정답/오답 해설 및 다음 단계 액션 박스 -->
+        <div id="quiz-feedback-box" class="quiz-feedback hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ----------------------------------------------------------------------
+       3. 수업 내용 정리 (학습지 마스터시트) 모달
+       ---------------------------------------------------------------------- -->
+  <div id="modal-notebook" class="modal-backdrop hidden">
+    <div class="modal-window modal-wide">
+      <div class="modal-header">
+        <h3>📖 수업 내용 정리: 중1 청소년 식생활 문제 완전정복</h3>
+        <button id="btn-close-notebook" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="notebook-content-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ----------------------------------------------------------------------
+       4. 탈출 성공 (클리어) 모달
+       ---------------------------------------------------------------------- -->
+  <div id="modal-clear" class="modal-backdrop hidden">
+    <div class="modal-window">
+      <div class="modal-header" style="background: #1b4332;">
+        <h3>🏆 저주 정화 완료! 부엌 탈출 성공!</h3>
+      </div>
+      <div class="modal-body clear-modal-body">
+        <!-- 교사 칭찬 배너 문구 -->
+        <div class="teacher-praise-banner">
+          🎉 축하합니다! 건강한 식생활을 실천할 수 있게 되었군요 ~ 🌿
+        </div>
+
+        <div id="clear-time-text" class="clear-time-display">
+          38초 만에 탈출 성공!
+        </div>
+
+        <!-- 탈출 순서 명단 / 랭킹 등록 칸 -->
+        <div class="leaderboard-section">
+          <div class="leaderboard-title">
+            <span>📝 탈출 명단 등록 (탈출 순서 랭킹)</span>
+            <span style="font-size: 0.8rem; color: #8ecae6;">빠른 순서대로 기록됩니다!</span>
+          </div>
+
+          <div class="player-submit-form">
+            <input type="text" id="input-player-name" placeholder="학번과 이름을 입력하세요 (예: 1-2 홍길동)" maxlength="15" />
+            <button id="btn-submit-name" class="btn-submit-record">명단 등록</button>
+          </div>
+
+          <ul id="leaderboard-list" class="leaderboard-list">
+            <!-- 랭킹 리스트 동적 삽입 -->
+          </ul>
+        </div>
+
+        <div class="ending-action-group">
+          <button id="btn-ending-notebook" class="btn-ending-worksheet">
+            📋 수업 내용 정리 (학습지 마스터시트 열기)
+          </button>
+          <button class="btn-ending-replay btn-restart-game">
+            🔄 다시 플레이하기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ----------------------------------------------------------------------
+       5. 게임 오버 모달 (시간 초과 또는 정신력 0)
+       ---------------------------------------------------------------------- -->
+  <div id="modal-game-over" class="modal-backdrop hidden">
+    <div class="modal-window">
+      <div class="modal-header" style="background: #4a1215;">
+        <h3>💀 탈출 실패 (Game Over)</h3>
+      </div>
+      <div class="modal-body clear-modal-body">
+        <p id="game-over-reason" style="font-size: 1.05rem; line-height: 1.6; color: #ffb4a2; margin-bottom: 24px;">
+          부엌의 어둠 속에 갇히고 말았습니다.
+        </p>
+        <button class="btn-step-action btn-retry btn-restart-game" style="padding: 14px; font-size: 1.05rem;">
+          🔄 다시 도전하여 건강 되찾기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 자바스크립트 모듈 로드 -->
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/notebook.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
